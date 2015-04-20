@@ -1,8 +1,8 @@
 /* 14:17 2015-04-19 Sunday */
 #include <head.h>
 
-pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER; 
-pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+/*pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER; */
+/*pthread_cond_t cond = PTHREAD_COND_INITIALIZER;*/
 void read_fifo(int r_fd)
 {
     int n;
@@ -12,12 +12,13 @@ void read_fifo(int r_fd)
     {
 
         /*pthread_mutex_lock(&lock);*/
-        pthread_cond_wait(&cond,&lock);
-        n =  read(r_fd,buf,sizeof(buf));
-        buf[n] = '\0';
-        fprintf(stdout,"Read %d types from %d : %s\n",n,r_fd,buf);
-
-        pthread_mutex_unlock(&lock);
+        /*pthread_cond_wait(&cond,&lock);*/
+        if ((n = read(r_fd,buf,sizeof(buf))) != 0)
+        {
+            buf[n] = '\0';
+            fprintf(stdout,"Read %d types from %d : %s\n",n,r_fd,buf);
+        }
+        /*pthread_mutex_unlock(&lock);*/
         if (strncmp(buf,"quit",4) == 0)
         {
             break;
@@ -32,14 +33,14 @@ void write_fifo(int w_fd)
 
     while (1)
     {
-        pthread_mutex_lock(&lock);
+        /*pthread_mutex_lock(&lock);*/
         fgets(buf,sizeof(buf),stdin);
         buf[strlen(buf)-1] = '\0';
 
         write(w_fd,buf,strlen(buf));
-        pthread_cond_signal(&cond);
+        /*pthread_cond_signal(&cond);*/
 
-        pthread_mutex_unlock(&lock);
+        /*pthread_mutex_unlock(&lock);*/
 
         if (strncmp(buf,"quit",4) == 0)
         {
